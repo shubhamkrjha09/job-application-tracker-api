@@ -5,5 +5,8 @@ class Application(BaseModel):
     company:str
     role:str
     status:str
-    
+
+class ApplicationCreate(BaseModel):
+    company:str
+    role:str
 

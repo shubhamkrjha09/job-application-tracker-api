@@ -1,5 +1,5 @@
 from fastapi import FastAPI ,HTTPException
-from models import Application
+from models import Application , ApplicationCreate
 
 
 app=FastAPI()
@@ -23,4 +23,10 @@ def get_applications_by_id(id:int):
         if application.id == id:
             return application
     raise HTTPException(status_code=404,detail="Application not found")  
+@app.post("/applications",status_code=201)
+def post_application(data:ApplicationCreate):
+    new_application=Application(id=len(applications)+1,company=data.company,role=data.role,status="Applied")
+    applications.append(new_application)
+    return new_application
+
 
