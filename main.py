@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI ,HTTPException
 from models import Application
 
 
@@ -15,4 +15,12 @@ def home():
 @app.get("/applications")
 def list_applications():
     return applications
+
+
+@app.get("/applications/{id}")
+def get_applications_by_id(id:int):
+    for application in applications:
+        if application.id == id:
+            return application
+    raise HTTPException(status_code=404,detail="Application not found")  
 
