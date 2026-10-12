@@ -36,4 +36,12 @@ def update_applicationstatus(id:int,data:ApplicationUpdate):
             return application
     raise HTTPException(status_code=404,detail="Application not found")
 
+@app.delete("/applications/{id}")
+def delete_application(id:int):
+    for application in applications:
+        if application.id==id:
+            applications.remove(application)
+            return {"message":"Application deleted"}
+    raise HTTPException(status_code=404,detail="Application not found")
+
 
