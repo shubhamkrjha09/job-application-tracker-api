@@ -9,4 +9,6 @@ class Application(BaseModel):
 class ApplicationCreate(BaseModel):
     company:str
     role:str
+class ApplicationUpdate(BaseModel):
+    status:str
 
