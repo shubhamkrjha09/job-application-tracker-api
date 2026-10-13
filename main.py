@@ -1,5 +1,6 @@
 from fastapi import FastAPI ,HTTPException
 from models import Application , ApplicationCreate , ApplicationUpdate
+from typing import Literal
 
 
 app=FastAPI()
@@ -13,10 +14,16 @@ def home():
     return {"message":"Job Application Tracker API is live "}
 
 @app.get("/applications")
-def list_applications():
-    return applications
+def list_applications(status:Literal["Applied","Interview","Offer","Rejected"] | None=None):
+    if status is None:
+        return applications
+    result=[]
+    for application in applications:
+        if application.status==status:
+            result.append(application)
+    return result
 
-
+    
 @app.get("/applications/{id}")
 def get_applications_by_id(id:int):
     for application in applications:
