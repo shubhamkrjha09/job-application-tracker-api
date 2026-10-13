@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 
 class Application(BaseModel):
@@ -8,8 +8,9 @@ class Application(BaseModel):
     status:Literal["Applied","Interview","Offer","Rejected"]
 
 class ApplicationCreate(BaseModel):
-    company:str
-    role:str
+    company:str=Field(min_length=1)
+    role:str=Field(min_length=1)
+
 class ApplicationUpdate(BaseModel):
     status:Literal["Applied","Interview","Offer","Rejected"]
 
