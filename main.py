@@ -1,6 +1,10 @@
 from fastapi import FastAPI ,HTTPException
 from models import Application , ApplicationCreate , ApplicationUpdate
 from typing import Literal
+from database import engine,Base
+import db_models
+
+Base.metadata.create_all(bind=engine)
 
 
 app=FastAPI()
