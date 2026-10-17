@@ -1,7 +1,8 @@
-from fastapi import FastAPI ,HTTPException
+from fastapi import FastAPI ,HTTPException,Depends
+from sqlalchemy.orm import Session
 from models import Application , ApplicationCreate , ApplicationUpdate
 from typing import Literal
-from database import engine,Base
+from database import engine,Base,get_db
 import db_models
 
 Base.metadata.create_all(bind=engine)
@@ -17,15 +18,11 @@ applications=[Application(id=1,company="Google",role="Intern",status="Applied"),
 def home():
     return {"message":"Job Application Tracker API is live "}
 
-@app.get("/applications")
-def list_applications(status:Literal["Applied","Interview","Offer","Rejected"] | None=None):
-    if status is None:
-        return applications
-    result=[]
-    for application in applications:
-        if application.status==status:
-            result.append(application)
-    return result
+@app.get("/applications",response_model=list[Application])
+def list_applications(db:Session=Depends(get_db)):
+    rows=db.query(db_models.ApplicationDB).all()
+    return rows
+    
 
     
 @app.get("/applications/{id}")
@@ -44,11 +41,14 @@ def get_next_id():
             biggest=application.id
     return biggest+1 
 
-@app.post("/applications",status_code=201)
-def post_application(data:ApplicationCreate):
-    new_application=Application(id=get_next_id(),company=data.company,role=data.role,status="Applied")
-    applications.append(new_application)
-    return new_application
+@app.post("/applications",status_code=201, response_model=Application)
+def post_application(data:ApplicationCreate,db:Session=Depends(get_db)):
+    new_row= db_models.ApplicationDB(company=data.company,role=data.role,status="Applied")
+    db.add(new_row)
+    db.commit()
+    db.refresh(new_row)
+    return new_row
+
 @app.patch("/applications/{id}")
 def update_applicationstatus(id:int,data:ApplicationUpdate):
     for application in applications:

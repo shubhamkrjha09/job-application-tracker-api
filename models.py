@@ -1,7 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Literal
 
 class Application(BaseModel):
+    model_config=ConfigDict(from_attributes=True)
+
     id:int
     company:str
     role:str
