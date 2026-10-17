@@ -60,11 +60,16 @@ def update_applicationstatus(id:int, data:ApplicationUpdate ,db:Session=Depends(
     return row
   
 @app.delete("/applications/{id}")
-def delete_application(id:int):
-    for application in applications:
-        if application.id==id:
-            applications.remove(application)
-            return {"message":"Application deleted"}
-    raise HTTPException(status_code=404,detail="Application not found")
+def delete_application(id:int,db:Session=Depends(get_db)):
+    row=db.query(db_models.ApplicationDB).filter(db_models.ApplicationDB.id==id).first()
+    if row is None:
+        raise HTTPException(status_code=404,detail="Application not found")
+    db.delete(row)
+    db.commit()
+    return {"message":"Application deleted"}
+
+        
+
+    
 
 
