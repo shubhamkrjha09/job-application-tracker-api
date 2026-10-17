@@ -25,12 +25,12 @@ def list_applications(db:Session=Depends(get_db)):
     
 
     
-@app.get("/applications/{id}")
-def get_applications_by_id(id:int):
-    for application in applications:
-        if application.id == id:
-            return application
-    raise HTTPException(status_code=404,detail="Application not found") 
+@app.get("/applications/{id}",response_model=Application)
+def get_applications_by_id(id:int,db:Session=Depends(get_db)):
+    row=db.query(db_models.ApplicationDB).filter(db_models.ApplicationDB.id==id).first()
+    if row is None:
+        raise HTTPException(status_code=404,detail="Application not found")
+    return row
 
 def get_next_id():
     if not applications:
@@ -49,14 +49,16 @@ def post_application(data:ApplicationCreate,db:Session=Depends(get_db)):
     db.refresh(new_row)
     return new_row
 
-@app.patch("/applications/{id}")
-def update_applicationstatus(id:int,data:ApplicationUpdate):
-    for application in applications:
-        if application.id== id:
-            application.status=data.status
-            return application
-    raise HTTPException(status_code=404,detail="Application not found")
-
+@app.patch("/applications/{id}" ,response_model=Application)
+def update_applicationstatus(id:int, data:ApplicationUpdate ,db:Session=Depends(get_db)):
+    row=db.query(db_models.ApplicationDB).filter(db_models.ApplicationDB.id==id).first()
+    if row is None:
+        raise HTTPException(status_code=404,detail="Application not found")
+    row.status=data.status
+    db.commit()
+    db.refresh(row)
+    return row
+  
 @app.delete("/applications/{id}")
 def delete_application(id:int):
     for application in applications:
